@@ -1,5 +1,6 @@
 package com.example.besthack_atomdev.service;
 
+import com.example.besthack_atomdev.common.OilBase;
 import com.example.besthack_atomdev.model.Lot;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -7,6 +8,7 @@ import org.apache.commons.csv.CSVRecord;
 import com.example.besthack_atomdev.repository.LotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.example.besthack_atomdev.common.FuelType;
 
 import java.util.List;
 import java.util.Optional;
@@ -74,7 +76,9 @@ public class LotService {
                     // Парсинг полей из строки CSV
                     LocalDate lotDate = LocalDate.parse(record.get(0)); // Дата лота
                     int kscssNbCode = Integer.parseInt(record.get(1)); // Код КССС НБ
+                    OilBase oilBase = OilBase.fromCode(kscssNbCode); // Преобразуем код в enum
                     int kscssFuelCode = Integer.parseInt(record.get(2)); // Код КССС Топлива
+                    FuelType fuelType = FuelType.fromCode(kscssFuelCode); // Проверяем, что код топлива существует
                     double startWeight = Double.parseDouble(record.get(3)); // Стартовой вес
                     double availableBalance = Double.parseDouble(record.get(4)); // Доступный остаток
                     String status = record.get(5); // Статус
@@ -83,8 +87,8 @@ public class LotService {
                     // Создание объекта Lot
                     Lot lot = new Lot();
                     lot.setLotDate(lotDate);
-                    lot.setKscssNbCode(kscssNbCode);
-                    lot.setKscssFuelCode(kscssFuelCode);
+                    lot.setOilBase(oilBase);
+                    lot.setFuelType(fuelType);
                     lot.setStartWeight(startWeight);
                     lot.setAvailableBalance(availableBalance);
                     lot.setStatus(status);

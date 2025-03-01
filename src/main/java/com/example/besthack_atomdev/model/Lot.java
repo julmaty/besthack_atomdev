@@ -1,6 +1,7 @@
 package com.example.besthack_atomdev.model;
 
 import com.example.besthack_atomdev.common.FuelType;
+import com.example.besthack_atomdev.common.OilBase;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -19,13 +20,13 @@ public class Lot {
     @Column(name = "lot_date", nullable = false) // Определяет столбец в таблице
     private LocalDate lotDate; // Дата лота
 
-    @Min(value = 1, message = "Код КССС НБ должен быть больше 0")
+    @Enumerated(EnumType.STRING) // Сохраняем название enum в базе данных
     @Column(name = "kscss_nb_code", nullable = false)
-    private int kscssNbCode; // Код КССС НБ
+    private OilBase oilBase;
 
     @Min(value = 1, message = "Код КССС Топлива должен быть больше 0")
     @Column(name = "kscss_fuel_code", nullable = false)
-    private int kscssFuelCode; // Код КССС Топлива
+    private FuelType fuelType; // Код КССС Топлива
 
     @Min(value = 1, message = "Стартовой вес должен быть больше 0")
     @Column(name = "start_weight", nullable = false)
@@ -52,10 +53,10 @@ public class Lot {
     }
 
     // Конструктор с параметрами
-    public Lot(LocalDate lotDate, int kscssNbCode, int kscssFuelCode, double startWeight, double pricePerTon) {
+    public Lot(LocalDate lotDate, OilBase oilBase, FuelType fuelType, double startWeight, double pricePerTon) {
         this.lotDate = lotDate;
-        this.kscssNbCode = kscssNbCode;
-        this.kscssFuelCode = kscssFuelCode;
+        this.oilBase = oilBase;
+        this.fuelType = fuelType;
         this.startWeight = startWeight;
         this.availableBalance = startWeight; // Инициализация доступного остатка
         this.pricePerTon = pricePerTon;
@@ -80,21 +81,22 @@ public class Lot {
         this.lotDate = lotDate;
     }
 
-    public int getKscssNbCode() {
-        return kscssNbCode;
+    public OilBase getOilBase() {
+        return oilBase;
     }
 
-    public void setKscssNbCode(int kscssNbCode) {
-        this.kscssNbCode = kscssNbCode;
+    public void setOilBase(OilBase oilBase) {
+        this.oilBase = oilBase;
     }
 
-    public int getKscssFuelCode() {
-        return kscssFuelCode;
+    public FuelType getFuelType() {
+        return fuelType;
     }
 
-    public void setKscssFuelCode(int kscssFuelCode) {
-        this.kscssFuelCode = kscssFuelCode;
+    public void setFuelType(FuelType fuelType) {
+        this.fuelType = fuelType;
     }
+
 
     public double getStartWeight() {
         return startWeight;
@@ -136,11 +138,6 @@ public class Lot {
         this.lotPrice = lotPrice;
     }
 
-    // Метод для получения типа топлива через enum
-    public FuelType getFuelType() {
-        return FuelType.fromCode(this.kscssFuelCode);
-    }
-
     // Метод для расчета цены лота
     private double calculateLotPrice() {
         return pricePerTon * (availableBalance / 1000); // Перевод из литров в тонны
@@ -177,8 +174,8 @@ public class Lot {
         return "Lot{" +
                 "id=" + id +
                 ", lotDate=" + lotDate +
-                ", kscssNbCode=" + kscssNbCode +
-                ", kscssFuelCode=" + kscssFuelCode +
+                ", kscssNbCode=" + oilBase +
+                ", kscssFuelCode=" + fuelType +
                 ", startWeight=" + startWeight +
                 ", availableBalance=" + availableBalance +
                 ", status='" + status + '\'' +
