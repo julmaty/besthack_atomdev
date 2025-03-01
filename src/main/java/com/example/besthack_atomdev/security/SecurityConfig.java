@@ -32,7 +32,8 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/auth/**",             // эндпоинты регистрации и логина
+                                "/auth/login",             // эндпоинты регистрации и логина
+                                "/auth/register",
                                 "/v3/api-docs/**",      // документация OpenAPI
                                 "/swagger-ui/**",       // Swagger UI
                                 "/swagger-ui.html"      // Swagger UI HTML-страница

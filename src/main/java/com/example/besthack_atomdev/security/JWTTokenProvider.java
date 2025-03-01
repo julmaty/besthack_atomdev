@@ -10,7 +10,7 @@ import java.util.Date;
 public class JWTTokenProvider {
 
     // Секрет для подписи токенов (его нужно хранить в безопасном месте)
-    private final String jwtSecret = "SecretKeyToGenJWTs";
+    private final String jwtSecret = "k3JmRWh7eZn5vjhqVfEcioAmMkGNiyVWH3p6q3NlQcEMr/VgqPO7YmcoOKU7uYfHLYIWwZ3ApeI1P+6JbQTWQnSn/TAFBw==";
     // Время жизни токена (например, 1 день)
     private final long jwtExpirationInMs = 86400000;
 
