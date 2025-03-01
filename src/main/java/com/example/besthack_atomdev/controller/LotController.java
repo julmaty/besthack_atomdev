@@ -1,9 +1,11 @@
 package com.example.besthack_atomdev.controller;
+import com.example.besthack_atomdev.dto.LotListRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.data.domain.Page;
 
 import com.example.besthack_atomdev.model.Lot;
 import com.example.besthack_atomdev.service.LotService;
@@ -23,9 +25,9 @@ public class LotController {
     private LotService lotService;
 
     // Получить все лоты
-    @GetMapping
-    public ResponseEntity<List<Lot>> getAllLots() {
-        List<Lot> lots = lotService.getAllLots();
+    @PostMapping
+    public ResponseEntity<Page<Lot>> getAllLots(@RequestBody LotListRequest request) {
+        Page<Lot> lots = lotService.getAllLots(request);
         return ResponseEntity.ok(lots);
     }
 
@@ -35,13 +37,6 @@ public class LotController {
         return lotService.getLotById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
-    }
-
-    // Создать новый лот
-    @PostMapping
-    public ResponseEntity<Lot> createLot(@RequestBody Lot lot) {
-        Lot createdLot = lotService.createLot(lot);
-        return ResponseEntity.status(201).body(createdLot);
     }
 
     // Обновить лот

@@ -24,7 +24,7 @@ public class Lot {
     @Column(name = "kscss_nb_code", nullable = false)
     private OilBase oilBase;
 
-    @Min(value = 1, message = "Код КССС Топлива должен быть больше 0")
+    @Enumerated(EnumType.STRING) // Сохраняем название enum в базе данных
     @Column(name = "kscss_fuel_code", nullable = false)
     private FuelType fuelType; // Код КССС Топлива
 
@@ -166,6 +166,11 @@ public class Lot {
         } else if (LocalDate.now().isAfter(lotDate.plusDays(1))) {
             status = "Неактивен";
         }
+    }
+
+    // Метод для получения региона через enum
+    public String getRegion() {
+        return oilBase.getRegion();
     }
 
     // Переопределение метода toString для удобства отладки

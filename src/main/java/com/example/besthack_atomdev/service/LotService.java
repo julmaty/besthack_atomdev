@@ -1,6 +1,7 @@
 package com.example.besthack_atomdev.service;
 
 import com.example.besthack_atomdev.common.OilBase;
+import com.example.besthack_atomdev.dto.LotListRequest;
 import com.example.besthack_atomdev.model.Lot;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -9,15 +10,16 @@ import com.example.besthack_atomdev.repository.LotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.example.besthack_atomdev.common.FuelType;
-
-import java.util.List;
-import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import java.util.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 @Service
 public class LotService {
@@ -25,11 +27,73 @@ public class LotService {
     @Autowired
     private LotRepository lotRepository;
 
-    // Получить все лоты
-    public List<Lot> getAllLots() {
-        return lotRepository.findAll();
+    public Page<Lot> getAllLots(LotListRequest request) {
+        // Инициализация фильтров
+        List<Integer> oilBaseCodes = request.getOilBaseCodes();
+        List<Integer> fuelTypeCodes = request.getFuelTypeCodes();
+
+        // Поиск по строке (если передана)
+        List<Integer> matchingOilBaseCodes = null;
+        List<Integer> matchingFuelTypeCodes = null;
+        if (request.getSearchString() != null && !request.getSearchString().isEmpty()) {
+            String searchString = request.getSearchString().toLowerCase();
+
+            // Поиск совпадений в OilBase
+            matchingOilBaseCodes = Arrays.stream(OilBase.values())
+                    .filter(oilBase -> oilBase.getName().toLowerCase().contains(searchString) ||
+                            oilBase.getRegion().toLowerCase().contains(searchString))
+                    .map(OilBase::getCode)
+                    .collect(Collectors.toList());
+
+            // Поиск совпадений в FuelType
+            matchingFuelTypeCodes = Arrays.stream(FuelType.values())
+                    .filter(fuelType -> fuelType.getDescription().toLowerCase().contains(searchString))
+                    .map(FuelType::getCode)
+                    .collect(Collectors.toList());
+        }
+
+        // Логика объединения фильтров для OilBase
+        List<Integer> finalOilBaseCodes = mergeFilters(oilBaseCodes, matchingOilBaseCodes);
+
+        // Логика объединения фильтров для FuelType
+        List<Integer> finalFuelTypeCodes = mergeFilters(fuelTypeCodes, matchingFuelTypeCodes);
+
+        // Преобразование кодов в объекты OilBase и FuelType
+        List<OilBase> finalOilBases = convertToOilBases(finalOilBaseCodes);
+        List<FuelType> finalFuelTypes = convertToFuelTypes(finalFuelTypeCodes);
+
+        // Пагинация
+        int page = request.getPage();
+        int size = 10; // Количество элементов на странице
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+
+        // Вызов метода репозитория
+        return lotRepository.findFiltered(
+                finalOilBases,
+                finalFuelTypes,
+                pageRequest
+        );
     }
 
+    /**
+     * Метод для объединения двух списков фильтров:
+     * - Если оба списка не пустые, берется их пересечение.
+     * - Если один из списков пустой, используется оставшийся.
+     * - Если оба пустые, возвращается null.
+     */
+    private List<Integer> mergeFilters(List<Integer> filter1, List<Integer> filter2) {
+        if (filter1 == null || filter1.isEmpty()) {
+            return filter2;
+        }
+        if (filter2 == null || filter2.isEmpty()) {
+            return filter1;
+        }
+
+        // Пересечение двух списков
+        Set<Integer> intersection = new HashSet<>(filter1);
+        intersection.retainAll(filter2);
+        return intersection.isEmpty() ? null : new ArrayList<>(intersection);
+    }
     // Получить лот по ID
     public Optional<Lot> getLotById(long id) {
         return lotRepository.findById(id);
@@ -106,5 +170,23 @@ public class LotService {
         }
 
         return errors; // Возвращаем список ошибок
+    }
+
+    private List<OilBase> convertToOilBases(List<Integer> codes) {
+        if (codes == null || codes.isEmpty()) {
+            return null;
+        }
+        return codes.stream()
+                .map(code -> OilBase.fromCode(code)) // Преобразуем код в объект OilBase
+                .collect(Collectors.toList());
+    }
+
+    private List<FuelType> convertToFuelTypes(List<Integer> codes) {
+        if (codes == null || codes.isEmpty()) {
+            return null;
+        }
+        return codes.stream()
+                .map(code -> FuelType.fromCode(code)) // Преобразуем код в объект FuelType
+                .collect(Collectors.toList());
     }
 }
