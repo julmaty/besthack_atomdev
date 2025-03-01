@@ -1,71 +1,110 @@
 package com.example.besthack_atomdev.model;
 import jakarta.persistence.*;
-import java.util.List;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
-@Entity
-@Table(name = "orders")
+import java.time.LocalDate;
+
+@Entity // Указывает, что класс является сущностью JPA
+@Table(name = "orders") // Определяет имя таблицы в базе данных
 public class Order {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Id // Первичный ключ
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Автоинкремент
+    private long id; // Номер заказа
 
-    // Связь с покупателем. Один покупатель может иметь много заказов.
-    @ManyToOne
-    @JoinColumn(name = "customer_id", nullable = false)
-    private Customer customer;
+    @NotNull(message = "Дата заказа не может быть null")
+    @Column(name = "order_date", nullable = false)
+    private LocalDate orderDate; // Дата заказа
 
-    // Связь с товарами. Один заказ может содержать много товаров, один товар может быть в разных заказах.
-    @ManyToMany
-    @JoinTable(
-            name = "order_products",
-            joinColumns = @JoinColumn(name = "order_id"),
-            inverseJoinColumns = @JoinColumn(name = "product_id")
-    )
-    private List<Product> products;
+    @ManyToOne // Связь "многие к одному" с сущностью Lot
+    @JoinColumn(name = "lot_number", referencedColumnName = "id", nullable = false) // Внешний ключ
+    private Lot lot; // Ссылка на лот
 
-    // Конструктор по умолчанию
+    @Min(value = 1, message = "Объём должен быть больше 0")
+    @Column(name = "volume", nullable = false)
+    private double volume; // Объём заказа (в литрах)
+
+    @NotNull(message = "Тип доставки не может быть null")
+    @Column(name = "delivery_type", nullable = false)
+    private String deliveryType; // Тип доставки ("Самовывоз" или "Доставка")
+
+    @Min(value = 1, message = "Id клиента должен быть больше 0")
+    @Column(name = "client_id", nullable = false)
+    private long clientId; // Идентификатор клиента B2B
+
+    // Конструктор без аргументов (требуется для JPA)
     public Order() {
     }
 
     // Конструктор с параметрами
-    public Order(Customer customer, List<Product> products) {
-        this.customer = customer;
-        this.products = products;
+    public Order(LocalDate orderDate, Lot lot, double volume, String deliveryType, long clientId) {
+        this.orderDate = orderDate;
+        this.lot = lot;
+        this.volume = volume;
+        this.deliveryType = deliveryType;
+        this.clientId = clientId;
     }
 
     // Геттеры и сеттеры
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 
-    public Customer getCustomer() {
-        return customer;
+    public LocalDate getOrderDate() {
+        return orderDate;
     }
 
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
+    public void setOrderDate(LocalDate orderDate) {
+        this.orderDate = orderDate;
     }
 
-    public List<Product> getProducts() {
-        return products;
+    public Lot getLot() {
+        return lot;
     }
 
-    public void setProducts(List<Product> products) {
-        this.products = products;
+    public void setLot(Lot lot) {
+        this.lot = lot;
     }
 
+    public double getVolume() {
+        return volume;
+    }
+
+    public void setVolume(double volume) {
+        this.volume = volume;
+    }
+
+    public String getDeliveryType() {
+        return deliveryType;
+    }
+
+    public void setDeliveryType(String deliveryType) {
+        this.deliveryType = deliveryType;
+    }
+
+    public long getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(long clientId) {
+        this.clientId = clientId;
+    }
+
+    // Переопределение метода toString для удобства отладки
     @Override
     public String toString() {
         return "Order{" +
                 "id=" + id +
-                ", customer=" + customer +
-                ", products=" + products +
+                ", orderDate=" + orderDate +
+                ", lot=" + lot +
+                ", volume=" + volume +
+                ", deliveryType='" + deliveryType + '\'' +
+                ", clientId=" + clientId +
                 '}';
     }
 }
-

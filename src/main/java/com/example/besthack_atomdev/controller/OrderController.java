@@ -1,106 +1,61 @@
 package com.example.besthack_atomdev.controller;
 
-import com.example.besthack_atomdev.dto.OrderRequest;
-import com.example.besthack_atomdev.model.Customer;
 import com.example.besthack_atomdev.model.Order;
-import com.example.besthack_atomdev.model.Product;
-import com.example.besthack_atomdev.repository.CustomerRepository;
-import com.example.besthack_atomdev.repository.OrderRepository;
-import com.example.besthack_atomdev.repository.ProductRepository;
+import com.example.besthack_atomdev.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
 
     @Autowired
-    private OrderRepository orderRepository;
+    private OrderService orderService;
 
-    @Autowired
-    private CustomerRepository customerRepository;
-
-    @Autowired
-    private ProductRepository productRepository;
-
-    // Получить список всех заказов
+    // Получить все заказы
     @GetMapping
-    public List<Order> getAllOrders() {
-        return orderRepository.findAll();
+    public ResponseEntity<List<Order>> getAllOrders() {
+        List<Order> orders = orderService.getAllOrders();
+        return ResponseEntity.ok(orders);
     }
 
-    // Получить заказ по id
+    // Получить заказ по ID
     @GetMapping("/{id}")
-    public ResponseEntity<Order> getOrderById(@PathVariable Long id) {
-        Optional<Order> optionalOrder = orderRepository.findById(id);
-        return optionalOrder.map(ResponseEntity::ok)
+    public ResponseEntity<Order> getOrderById(@PathVariable long id) {
+        return orderService.getOrderById(id)
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Создать новый заказ через DTO (без передачи id заказа, только id покупателя и товаров)
+    // Создать новый заказ
     @PostMapping
-    public ResponseEntity<Order> createOrder(@RequestBody OrderRequest orderRequest) {
-        // Получаем покупателя по id
-        Optional<Customer> customerOptional = customerRepository.findById(orderRequest.getCustomerId());
-        if (!customerOptional.isPresent()) {
-            return ResponseEntity.badRequest().build();
-        }
-        Customer customer = customerOptional.get();
-
-        // Получаем список товаров по переданным id
-        List<Product> products = productRepository.findAllById(orderRequest.getProductIds());
-        if (products.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        // Формируем новый заказ
-        Order order = new Order();
-        order.setCustomer(customer);
-        order.setProducts(products);
-
-        Order savedOrder = orderRepository.save(order);
-        return ResponseEntity.ok(savedOrder);
+    public ResponseEntity<Order> createOrder(@RequestBody Order order) {
+        Order createdOrder = orderService.createOrder(order);
+        return ResponseEntity.status(201).body(createdOrder);
     }
 
-    // Обновить существующий заказ через DTO (передаем id заказа в path, а в теле – customerId и список productIds)
+    // Обновить заказ
     @PutMapping("/{id}")
-    public ResponseEntity<Order> updateOrder(@PathVariable Long id, @RequestBody OrderRequest orderRequest) {
-        Optional<Order> optionalOrder = orderRepository.findById(id);
-        if (!optionalOrder.isPresent()) {
+    public ResponseEntity<Order> updateOrder(@PathVariable long id, @RequestBody Order updatedOrder) {
+        Order order = orderService.updateOrder(id, updatedOrder);
+        if (order != null) {
+            return ResponseEntity.ok(order);
+        } else {
             return ResponseEntity.notFound().build();
         }
-        Order order = optionalOrder.get();
-
-        // Обновляем покупателя заказа
-        Optional<Customer> customerOptional = customerRepository.findById(orderRequest.getCustomerId());
-        if (!customerOptional.isPresent()) {
-            return ResponseEntity.badRequest().build();
-        }
-        Customer customer = customerOptional.get();
-        order.setCustomer(customer);
-
-        // Обновляем список товаров заказа
-        List<Product> products = productRepository.findAllById(orderRequest.getProductIds());
-        if (products.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-        order.setProducts(products);
-
-        Order updatedOrder = orderRepository.save(order);
-        return ResponseEntity.ok(updatedOrder);
     }
 
-    // Удалить заказ по id
+    // Удалить заказ
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteOrder(@PathVariable Long id) {
-        if (!orderRepository.existsById(id)) {
+    public ResponseEntity<Void> deleteOrder(@PathVariable long id) {
+        boolean isDeleted = orderService.deleteOrder(id);
+        if (isDeleted) {
+            return ResponseEntity.noContent().build();
+        } else {
             return ResponseEntity.notFound().build();
         }
-        orderRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
     }
 }
