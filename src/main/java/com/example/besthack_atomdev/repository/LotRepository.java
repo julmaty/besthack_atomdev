@@ -26,6 +26,11 @@ public interface LotRepository extends JpaRepository<Lot, Long> {
             Pageable pageable
     );
 
-    @Query("SELECT COALESCE(SUM(l.availableBalance), 0) FROM Lot l WHERE l.oilBase = :oilBase")
-    double getTotalAvailableBalanceByOilBase(@Param("oilBase") OilBase oilBase);
+    @Query("SELECT COALESCE(SUM(l.availableBalance), 0) " +
+            "FROM Lot l " +
+            "WHERE l.oilBase = :oilBase AND l.fuelType = :fuelType")
+    double getTotalAvailableBalanceByOilBaseAndFuelType(
+            @Param("oilBase") OilBase oilBase,
+            @Param("fuelType") FuelType fuelType
+    );
 }

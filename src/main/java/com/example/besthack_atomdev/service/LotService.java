@@ -235,8 +235,11 @@ public class LotService {
             case INACTIVE -> "Неактивен";
         };
 
-        // Получаем сумму availableBalance для OilBase текущего лота
-        double availableBalanceByOilBase = getTotalAvailableBalanceByOilBase(lot.getOilBase());
+        // Получаем сумму availableBalance для OilBase и FuelType текущего лота
+        double availableBalanceByOilBaseAndFuelType = getTotalAvailableBalanceByOilBaseAndFuelType(
+                lot.getOilBase(),
+                lot.getFuelType()
+        );
 
         return new LotCardResponse(
                 lot.getId(),
@@ -248,14 +251,14 @@ public class LotService {
                 status,
                 lot.getPricePerTon(),
                 lot.getLotPrice(),
-                availableBalanceByOilBase // Добавляем новое поле
+                availableBalanceByOilBaseAndFuelType // Добавляем новое поле
         );
     }
 
-    public double getTotalAvailableBalanceByOilBase(OilBase oilBase) {
-        if (oilBase == null) {
-            throw new IllegalArgumentException("OilBase не может быть null");
+    public double getTotalAvailableBalanceByOilBaseAndFuelType(OilBase oilBase, FuelType fuelType) {
+        if (oilBase == null || fuelType == null) {
+            throw new IllegalArgumentException("OilBase и FuelType не могут быть null");
         }
-        return lotRepository.getTotalAvailableBalanceByOilBase(oilBase);
+        return lotRepository.getTotalAvailableBalanceByOilBaseAndFuelType(oilBase, fuelType);
     }
 }
