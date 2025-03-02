@@ -64,6 +64,7 @@ public class OrderService {
 
         // Уменьшение доступного баланса лота
         lot.setAvailableBalance(lot.getAvailableBalance() - request.getVolume());
+        lot.setLotPrice();
         lotRepository.save(lot);
 
         // Создание заказа
@@ -101,6 +102,7 @@ public class OrderService {
         LotListResponse lotListResponse = mapToLotListResponse(order.getLot()); // Преобразуем лот
 
         return new OrderResponse(
+                order.getId(),
                 order.getOrderDate(),
                 order.getVolume(),
                 deliveryType,

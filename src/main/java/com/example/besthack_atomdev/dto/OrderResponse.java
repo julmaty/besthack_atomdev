@@ -3,13 +3,15 @@ package com.example.besthack_atomdev.dto;
 import java.time.LocalDate;
 
 public class OrderResponse {
+    private long Id;
     private LocalDate orderDate; // Дата заказа
     private double volume; // Объем заказа
     private String deliveryType; // Тип доставки на русском языке
     private LotListResponse lot; // Лот в формате LotListResponse
 
     // Конструктор
-    public OrderResponse(LocalDate orderDate, double volume, String deliveryType, LotListResponse lot) {
+    public OrderResponse(long id, LocalDate orderDate, double volume, String deliveryType, LotListResponse lot) {
+        this.Id = id;
         this.orderDate = orderDate;
         this.volume = volume;
         this.deliveryType = deliveryType;
@@ -17,6 +19,10 @@ public class OrderResponse {
     }
 
     // Геттеры (сеттеры не нужны, так как объект immutable)
+    public long getId() {
+        return Id;
+    }
+
     public LocalDate getOrderDate() {
         return orderDate;
     }

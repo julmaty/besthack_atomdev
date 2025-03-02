@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.PageImpl;
 
 @Service
 public class LotService {
@@ -59,6 +60,14 @@ public class LotService {
         // Логика объединения фильтров для FuelType
         List<Integer> finalFuelTypeCodes = mergeFilters(fuelTypeCodes, matchingFuelTypeCodes);
 
+        // Проверка на пустоту matchingOilBaseCodes и matchingFuelTypeCodes
+        if ((matchingOilBaseCodes == null || matchingOilBaseCodes.isEmpty()) &&
+                (matchingFuelTypeCodes == null || matchingFuelTypeCodes.isEmpty()) &&
+                (request.getSearchString() != null && !request.getSearchString().isEmpty())) {
+            // Возвращаем пустую страницу
+            return new PageImpl<>(Collections.emptyList(), PageRequest.of(request.getPage(), 10), 0);
+        }
+
         // Преобразование кодов в объекты OilBase и FuelType
         List<OilBase> finalOilBases = convertToOilBases(finalOilBaseCodes);
         List<FuelType> finalFuelTypes = convertToFuelTypes(finalFuelTypeCodes);
@@ -68,10 +77,14 @@ public class LotService {
         int size = 10; // Количество элементов на странице
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
 
-        // Вызов метода репозитория
+        // Вычисляем валидную дату для фильтрации: текущая дата минус 1 день
+        LocalDate validDate = LocalDate.now().minusDays(1);
+
+        // Вызов метода репозитория с передачей validDate
         Page<Lot> lots = lotRepository.findFiltered(
                 finalOilBases,
                 finalFuelTypes,
+                validDate,
                 pageRequest
         );
 
@@ -160,6 +173,7 @@ public class LotService {
                     lot.setStartWeight(startWeight);
                     lot.setAvailableBalance(availableBalance);
                     lot.setPricePerTon(pricePerTon);
+                    lot.setLotPrice();
 
                     // Сохранение лота в базу данных
                     lotRepository.save(lot);

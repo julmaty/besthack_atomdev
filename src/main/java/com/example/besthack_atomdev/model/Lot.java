@@ -121,8 +121,8 @@ public class Lot {
         return lotPrice;
     }
 
-    public void setLotPrice(double lotPrice) {
-        this.lotPrice = lotPrice;
+    public void setLotPrice() {
+        this.lotPrice = calculateLotPrice();
     }
 
     // Метод для расчета цены лота
