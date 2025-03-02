@@ -145,8 +145,7 @@ public class LotService {
                     FuelType fuelType = FuelType.fromCode(kscssFuelCode); // Проверяем, что код топлива существует
                     double startWeight = Double.parseDouble(record.get(3)); // Стартовой вес
                     double availableBalance = Double.parseDouble(record.get(4)); // Доступный остаток
-                    String status = record.get(5); // Статус
-                    double pricePerTon = Double.parseDouble(record.get(6)); // Цена за 1 тонну
+                    double pricePerTon = Double.parseDouble(record.get(5)); // Цена за 1 тонну
 
                     // Создание объекта Lot
                     Lot lot = new Lot();
@@ -155,7 +154,6 @@ public class LotService {
                     lot.setFuelType(fuelType);
                     lot.setStartWeight(startWeight);
                     lot.setAvailableBalance(availableBalance);
-                    lot.setStatus(status);
                     lot.setPricePerTon(pricePerTon);
 
                     // Сохранение лота в базу данных

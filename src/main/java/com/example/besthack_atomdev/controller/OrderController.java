@@ -1,5 +1,10 @@
 package com.example.besthack_atomdev.controller;
+import com.example.besthack_atomdev.model.User;
+import com.example.besthack_atomdev.service.UserService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.example.besthack_atomdev.dto.CreateOrderRequest;
 import com.example.besthack_atomdev.model.Order;
 import com.example.besthack_atomdev.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +19,9 @@ public class OrderController {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private UserService userService;
 
     // Получить все заказы
     @GetMapping
@@ -32,8 +40,19 @@ public class OrderController {
 
     // Создать новый заказ
     @PostMapping
-    public ResponseEntity<Order> createOrder(@RequestBody Order order) {
-        Order createdOrder = orderService.createOrder(order);
+    public ResponseEntity<Order> createOrder(@RequestBody CreateOrderRequest request) {
+        // Извлечение clientId из токена авторизации
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName(); // Предполагается, что username в токене - это email
+
+        // Поиск пользователя по email
+        User user = userService.findUserByEmail(email);
+        if (user == null) {
+            throw new IllegalArgumentException("Пользователь с email " + email + " не найден");
+        }
+
+        // Создание заказа
+        Order createdOrder = orderService.createOrder(user.getId(), request);
         return ResponseEntity.status(201).body(createdOrder);
     }
 

@@ -2,6 +2,7 @@ package com.example.besthack_atomdev.model;
 
 import com.example.besthack_atomdev.common.FuelType;
 import com.example.besthack_atomdev.common.OilBase;
+import com.example.besthack_atomdev.common.Status;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -36,10 +37,6 @@ public class Lot {
     @Column(name = "available_balance", nullable = false)
     private double availableBalance; // Доступный остаток (по умолчанию стартовый вес)
 
-    @NotNull(message = "Статус не может быть null")
-    @Column(name = "status", nullable = false)
-    private String status; // Статус ("Подтвержден", "Продан", "Неактивен")
-
     @Min(value = 1, message = "Цена за 1 тонну должна быть больше 0")
     @Column(name = "price_per_ton", nullable = false)
     private double pricePerTon; // Цена за 1 тонну
@@ -49,7 +46,7 @@ public class Lot {
 
     // Конструктор без аргументов (требуется для JPA)
     public Lot() {
-        this.status = "Подтвержден"; // Начальный статус
+        // Пустой конструктор для JPA
     }
 
     // Конструктор с параметрами
@@ -61,7 +58,6 @@ public class Lot {
         this.availableBalance = startWeight; // Инициализация доступного остатка
         this.pricePerTon = pricePerTon;
         this.lotPrice = calculateLotPrice(); // Расчет цены лота
-        this.status = "Подтвержден"; // Начальный статус
     }
 
     // Геттеры и сеттеры
@@ -97,7 +93,6 @@ public class Lot {
         this.fuelType = fuelType;
     }
 
-
     public double getStartWeight() {
         return startWeight;
     }
@@ -112,14 +107,6 @@ public class Lot {
 
     public void setAvailableBalance(double availableBalance) {
         this.availableBalance = availableBalance;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public double getPricePerTon() {
@@ -150,27 +137,17 @@ public class Lot {
         }
         availableBalance -= orderVolume;
         lotPrice = calculateLotPrice();
-
-        // Обновление статуса
-        if (availableBalance == 0) {
-            status = "Продан";
-        } else if (LocalDate.now().isAfter(lotDate.plusDays(1))) {
-            status = "Неактивен";
-        }
     }
 
-    // Метод для обновления статуса лота
-    public void updateStatus() {
-        if (availableBalance == 0) {
-            status = "Продан";
+    // Метод для получения вычислимого статуса
+    public Status getStatus() {
+        if (availableBalance <= 0) {
+            return Status.SOLD; // Продано
         } else if (LocalDate.now().isAfter(lotDate.plusDays(1))) {
-            status = "Неактивен";
+            return Status.INACTIVE; // Неактивен
+        } else {
+            return Status.CONFIRMED; // Подтвержден
         }
-    }
-
-    // Метод для получения региона через enum
-    public String getRegion() {
-        return oilBase.getRegion();
     }
 
     // Переопределение метода toString для удобства отладки
@@ -183,7 +160,7 @@ public class Lot {
                 ", kscssFuelCode=" + fuelType +
                 ", startWeight=" + startWeight +
                 ", availableBalance=" + availableBalance +
-                ", status='" + status + '\'' +
+                ", status=" + getStatus() +
                 ", pricePerTon=" + pricePerTon +
                 ", lotPrice=" + lotPrice +
                 '}';

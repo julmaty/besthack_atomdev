@@ -1,4 +1,5 @@
 package com.example.besthack_atomdev.model;
+import com.example.besthack_atomdev.common.DeliveryType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -26,8 +27,9 @@ public class Order {
     private double volume; // Объём заказа (в литрах)
 
     @NotNull(message = "Тип доставки не может быть null")
+    @Enumerated(EnumType.STRING) // Сохраняем название enum в базе данных
     @Column(name = "delivery_type", nullable = false)
-    private String deliveryType; // Тип доставки ("Самовывоз" или "Доставка")
+    private DeliveryType deliveryType;
 
     @Min(value = 1, message = "Id клиента должен быть больше 0")
     @Column(name = "client_id", nullable = false)
@@ -38,7 +40,7 @@ public class Order {
     }
 
     // Конструктор с параметрами
-    public Order(LocalDate orderDate, Lot lot, double volume, String deliveryType, long clientId) {
+    public Order(LocalDate orderDate, Lot lot, double volume, DeliveryType deliveryType, long clientId) {
         this.orderDate = orderDate;
         this.lot = lot;
         this.volume = volume;
@@ -79,11 +81,11 @@ public class Order {
         this.volume = volume;
     }
 
-    public String getDeliveryType() {
+    public DeliveryType getDeliveryType() {
         return deliveryType;
     }
 
-    public void setDeliveryType(String deliveryType) {
+    public void setDeliveryType(DeliveryType deliveryType) {
         this.deliveryType = deliveryType;
     }
 
