@@ -6,12 +6,15 @@ import com.example.besthack_atomdev.dto.LotListResponse;
 import com.example.besthack_atomdev.dto.OrderResponse;
 import com.example.besthack_atomdev.model.Lot;
 import com.example.besthack_atomdev.model.Order;
+import com.example.besthack_atomdev.model.User;
 import com.example.besthack_atomdev.repository.LotRepository;
 import com.example.besthack_atomdev.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.stream.Collectors;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -26,9 +29,22 @@ public class OrderService {
     @Autowired
     private LotRepository lotRepository;
 
+    @Autowired
+    private UserService userService;
+
     public List<OrderResponse> getAllOrders() {
+        // Получаем данные текущего пользователя из контекста безопасности
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName(); // Предполагается, что username в токене - это email
+
+        // Поиск пользователя по email
+        User user = userService.findUserByEmail(email);
+        if (user == null) {
+            throw new IllegalArgumentException("Пользователь с email " + email + " не найден");
+        }
+
         // Получаем все заказы из репозитория
-        List<Order> orders = orderRepository.findAll();
+        List<Order> orders = orderRepository.findAllByClientId(user.getId());
 
         // Преобразуем каждый заказ в OrderResponse
         return orders.stream()
