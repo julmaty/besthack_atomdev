@@ -61,8 +61,8 @@ public class LotService {
         List<Integer> finalFuelTypeCodes = mergeFilters(fuelTypeCodes, matchingFuelTypeCodes);
 
         // Проверка на пустоту matchingOilBaseCodes и matchingFuelTypeCodes
-        if ((matchingOilBaseCodes == null || matchingOilBaseCodes.isEmpty()) &&
-                (matchingFuelTypeCodes == null || matchingFuelTypeCodes.isEmpty()) &&
+        if ((finalOilBaseCodes == null || finalOilBaseCodes.isEmpty()) &&
+                (finalFuelTypeCodes == null || finalFuelTypeCodes.isEmpty()) &&
                 (request.getSearchString() != null && !request.getSearchString().isEmpty())) {
             // Возвращаем пустую страницу
             return new PageImpl<>(Collections.emptyList(), PageRequest.of(request.getPage(), 10), 0);
