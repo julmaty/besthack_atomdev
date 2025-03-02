@@ -1,0 +1,13 @@
+.fieldPair {
+    margin-bottom: 8px;
+}
+
+.fieldLabel {
+    font-weight: lighter;
+    min-width: 150px;
+    color: gray;
+}
+
+.fieldValue {
+    margin-top: 4px;
+}

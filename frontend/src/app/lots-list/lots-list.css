@@ -1,0 +1,88 @@
+.page_lots_list {
+  padding:20px;
+
+  .title_list_name, .title_filter_name{
+    margin-top:8px;
+    font-size:20px;
+    font-weight:bold;
+  }
+
+  .search_lots_list{
+    width:100%;
+    .ant-input-wrapper{
+      .ant-input{
+        height:34px;
+      }
+      .ant-btn{
+        height:34px;
+
+      }
+    }
+  }
+
+
+  .lot_card{
+    margin-bottom:12px;
+    font-size:15px;
+
+  }
+
+  .ant-card-head-title{
+    font-size:18px;
+    font-weight:bold;
+
+  }
+
+  .ant-card-body{
+    box-shadow: 0 2px 8px #DCDCE070;
+
+  }
+
+  .fuel_card{
+    margin-top:-2px;
+    margin-bottom:4px;
+
+  }
+
+  .number_card{
+    margin-bottom:4px;
+
+  }
+
+  .name_card{
+    margin-bottom:4px;
+
+  }
+
+  .region_card{
+    margin-bottom:10px;
+
+  }
+
+  .price_card{
+    margin-bottom:-6px;
+    font-size:26px;
+    font-weight:700;
+
+  }
+
+  .remains_card{
+    margin-bottom:2px;
+    color: #727272;
+    font-size:15px;
+
+  }
+
+  .button_card{
+    width: 200px;
+    background-color: #387AF2;
+
+  }
+
+  .subtitle_filter_name{
+    font-size:16px;
+    font-weight:600;
+
+  }
+
+}
