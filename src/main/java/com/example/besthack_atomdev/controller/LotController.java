@@ -40,17 +40,6 @@ public class LotController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Обновить лот
-    @PutMapping("/{id}")
-    public ResponseEntity<Lot> updateLot(@PathVariable long id, @RequestBody Lot updatedLot) {
-        Lot lot = lotService.updateLot(id, updatedLot);
-        if (lot != null) {
-            return ResponseEntity.ok(lot);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
     // Удалить лот
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLot(@PathVariable long id) {

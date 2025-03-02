@@ -57,17 +57,6 @@ public class OrderController {
         return ResponseEntity.status(201).body(createdOrder);
     }
 
-    // Обновить заказ
-    @PutMapping("/{id}")
-    public ResponseEntity<Order> updateOrder(@PathVariable long id, @RequestBody Order updatedOrder) {
-        Order order = orderService.updateOrder(id, updatedOrder);
-        if (order != null) {
-            return ResponseEntity.ok(order);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
     // Удалить заказ
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOrder(@PathVariable long id) {
