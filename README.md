@@ -15,7 +15,7 @@ Docker и docker-compose находятся в репозитории.
 
 Необходимо склонировать репозиторий, перейти в его папку и запустить docker-compose up. Это автоматически развернет базу данных postgres и бэкенд на Java.
 
-В настоящий момент бэкенд развернут на сервере: https://skoltech-hackathon-prod.vercel.app/
+В настоящий момент бэкенд развернут на сервере: https://skoltech-hackathon-prod.vercel.app/auth-pages/login
 
 Его swagger размещен по адресу Swagger: http://vk-atom-dev.ru/swagger-ui/index.html.
 
