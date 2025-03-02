@@ -1,6 +1,7 @@
 package com.example.besthack_atomdev.service;
 
 import com.example.besthack_atomdev.common.OilBase;
+import com.example.besthack_atomdev.dto.LotCardResponse;
 import com.example.besthack_atomdev.dto.LotListRequest;
 import com.example.besthack_atomdev.dto.LotListResponse;
 import com.example.besthack_atomdev.model.Lot;
@@ -112,9 +113,9 @@ public class LotService {
         return intersection.isEmpty() ? null : new ArrayList<>(intersection);
     }
     // Получить лот по ID
-    public Optional<LotListResponse> getLotById(long id) {
+    public Optional<LotCardResponse> getLotById(long id) {
         return lotRepository.findById(id)
-                .map(this::mapToLotListResponse);
+                .map(this::mapToLotCardResponse);
     }
 
     // Создать новый лот
@@ -225,5 +226,36 @@ public class LotService {
                 lot.getPricePerTon(),
                 lot.getLotPrice()
         );
+    }
+
+    private LotCardResponse mapToLotCardResponse(Lot lot) {
+        String status = switch (lot.getStatus()) {
+            case CONFIRMED -> "Подтвержден";
+            case SOLD -> "Продан";
+            case INACTIVE -> "Неактивен";
+        };
+
+        // Получаем сумму availableBalance для OilBase текущего лота
+        double availableBalanceByOilBase = getTotalAvailableBalanceByOilBase(lot.getOilBase());
+
+        return new LotCardResponse(
+                lot.getId(),
+                lot.getLotDate(),
+                lot.getOilBase().getCode(), // Получаем код нефтебазы
+                lot.getFuelType().getCode(), // Получаем код топлива
+                lot.getStartWeight(),
+                lot.getAvailableBalance(),
+                status,
+                lot.getPricePerTon(),
+                lot.getLotPrice(),
+                availableBalanceByOilBase // Добавляем новое поле
+        );
+    }
+
+    public double getTotalAvailableBalanceByOilBase(OilBase oilBase) {
+        if (oilBase == null) {
+            throw new IllegalArgumentException("OilBase не может быть null");
+        }
+        return lotRepository.getTotalAvailableBalanceByOilBase(oilBase);
     }
 }

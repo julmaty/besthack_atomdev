@@ -25,4 +25,7 @@ public interface LotRepository extends JpaRepository<Lot, Long> {
             @Param("validDate") LocalDate validDate,
             Pageable pageable
     );
+
+    @Query("SELECT COALESCE(SUM(l.availableBalance), 0) FROM Lot l WHERE l.oilBase = :oilBase")
+    double getTotalAvailableBalanceByOilBase(@Param("oilBase") OilBase oilBase);
 }
