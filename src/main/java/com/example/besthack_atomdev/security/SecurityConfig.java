@@ -34,6 +34,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/auth/login",             // эндпоинты регистрации и логина
                                 "/auth/register",
+                                "/api/lots/upload",
                                 "/v3/api-docs/**",      // документация OpenAPI
                                 "/swagger-ui/**",       // Swagger UI
                                 "/swagger-ui.html"      // Swagger UI HTML-страница
