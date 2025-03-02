@@ -1,4 +1,5 @@
 package com.example.besthack_atomdev.controller;
+import com.example.besthack_atomdev.dto.OrderResponse;
 import com.example.besthack_atomdev.model.User;
 import com.example.besthack_atomdev.service.UserService;
 import org.springframework.security.core.Authentication;
@@ -25,14 +26,14 @@ public class OrderController {
 
     // Получить все заказы
     @GetMapping
-    public ResponseEntity<List<Order>> getAllOrders() {
-        List<Order> orders = orderService.getAllOrders();
+    public ResponseEntity<List<OrderResponse>> getAllOrders() {
+        List<OrderResponse> orders = orderService.getAllOrders();
         return ResponseEntity.ok(orders);
     }
 
     // Получить заказ по ID
     @GetMapping("/{id}")
-    public ResponseEntity<Order> getOrderById(@PathVariable long id) {
+    public ResponseEntity<OrderResponse> getOrderById(@PathVariable long id) {
         return orderService.getOrderById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

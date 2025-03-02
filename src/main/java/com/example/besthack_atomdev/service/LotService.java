@@ -2,6 +2,7 @@ package com.example.besthack_atomdev.service;
 
 import com.example.besthack_atomdev.common.OilBase;
 import com.example.besthack_atomdev.dto.LotListRequest;
+import com.example.besthack_atomdev.dto.LotListResponse;
 import com.example.besthack_atomdev.model.Lot;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -27,7 +28,7 @@ public class LotService {
     @Autowired
     private LotRepository lotRepository;
 
-    public Page<Lot> getAllLots(LotListRequest request) {
+    public Page<LotListResponse> getAllLots(LotListRequest request) {
         // Инициализация фильтров
         List<Integer> oilBaseCodes = request.getOilBaseCodes();
         List<Integer> fuelTypeCodes = request.getFuelTypeCodes();
@@ -68,11 +69,14 @@ public class LotService {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
 
         // Вызов метода репозитория
-        return lotRepository.findFiltered(
+        Page<Lot> lots = lotRepository.findFiltered(
                 finalOilBases,
                 finalFuelTypes,
                 pageRequest
         );
+
+        // Преобразуем каждый лот в LotListResponse
+        return lots.map(this::mapToLotListResponse);
     }
 
     /**
@@ -95,8 +99,9 @@ public class LotService {
         return intersection.isEmpty() ? null : new ArrayList<>(intersection);
     }
     // Получить лот по ID
-    public Optional<Lot> getLotById(long id) {
-        return lotRepository.findById(id);
+    public Optional<LotListResponse> getLotById(long id) {
+        return lotRepository.findById(id)
+                .map(this::mapToLotListResponse);
     }
 
     // Создать новый лот
@@ -186,5 +191,25 @@ public class LotService {
         return codes.stream()
                 .map(code -> FuelType.fromCode(code)) // Преобразуем код в объект FuelType
                 .collect(Collectors.toList());
+    }
+
+    private LotListResponse mapToLotListResponse(Lot lot) {
+        String status = switch (lot.getStatus()) {
+            case CONFIRMED -> "Подтвержден";
+            case SOLD -> "Продан";
+            case INACTIVE -> "Неактивен";
+        };
+
+        return new LotListResponse(
+                lot.getId(),
+                lot.getLotDate(),
+                lot.getOilBase().getCode(), // Получаем код нефтебазы
+                lot.getFuelType().getCode(), // Получаем код топлива
+                lot.getStartWeight(),
+                lot.getAvailableBalance(),
+                status,
+                lot.getPricePerTon(),
+                lot.getLotPrice()
+        );
     }
 }

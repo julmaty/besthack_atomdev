@@ -2,6 +2,8 @@ package com.example.besthack_atomdev.service;
 
 import com.example.besthack_atomdev.common.DeliveryType;
 import com.example.besthack_atomdev.dto.CreateOrderRequest;
+import com.example.besthack_atomdev.dto.LotListResponse;
+import com.example.besthack_atomdev.dto.OrderResponse;
 import com.example.besthack_atomdev.model.Lot;
 import com.example.besthack_atomdev.model.Order;
 import com.example.besthack_atomdev.repository.LotRepository;
@@ -9,6 +11,7 @@ import com.example.besthack_atomdev.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.stream.Collectors;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -23,14 +26,20 @@ public class OrderService {
     @Autowired
     private LotRepository lotRepository;
 
-    // Получить все заказы
-    public List<Order> getAllOrders() {
-        return orderRepository.findAll();
+    public List<OrderResponse> getAllOrders() {
+        // Получаем все заказы из репозитория
+        List<Order> orders = orderRepository.findAll();
+
+        // Преобразуем каждый заказ в OrderResponse
+        return orders.stream()
+                .map(this::mapToOrderResponse)
+                .collect(Collectors.toList());
     }
 
     // Получить заказ по ID
-    public Optional<Order> getOrderById(long id) {
-        return orderRepository.findById(id);
+    public Optional<OrderResponse> getOrderById(long id) {
+        return orderRepository.findById(id)
+                .map(this::mapToOrderResponse);
     }
 
     // Создать новый заказ
@@ -85,5 +94,37 @@ public class OrderService {
             return true;
         }
         return false; // Заказ не найден
+    }
+
+    private OrderResponse mapToOrderResponse(Order order) {
+        String deliveryType = order.getDeliveryType().getDescription(); // Описание типа доставки
+        LotListResponse lotListResponse = mapToLotListResponse(order.getLot()); // Преобразуем лот
+
+        return new OrderResponse(
+                order.getOrderDate(),
+                order.getVolume(),
+                deliveryType,
+                lotListResponse
+        );
+    }
+
+    private LotListResponse mapToLotListResponse(Lot lot) {
+        String status = switch (lot.getStatus()) {
+            case CONFIRMED -> "Подтвержден";
+            case SOLD -> "Продан";
+            case INACTIVE -> "Неактивен";
+        };
+
+        return new LotListResponse(
+                lot.getId(),
+                lot.getLotDate(),
+                lot.getOilBase().getCode(), // Код нефтебазы
+                lot.getFuelType().getCode(), // Код топлива
+                lot.getStartWeight(),
+                lot.getAvailableBalance(),
+                status,
+                lot.getPricePerTon(),
+                lot.getLotPrice()
+        );
     }
 }

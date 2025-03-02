@@ -1,5 +1,6 @@
 package com.example.besthack_atomdev.controller;
 import com.example.besthack_atomdev.dto.LotListRequest;
+import com.example.besthack_atomdev.dto.LotListResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -26,14 +27,14 @@ public class LotController {
 
     // Получить все лоты
     @PostMapping
-    public ResponseEntity<Page<Lot>> getAllLots(@RequestBody LotListRequest request) {
-        Page<Lot> lots = lotService.getAllLots(request);
+    public ResponseEntity<Page<LotListResponse>> getAllLots(@RequestBody LotListRequest request) {
+        Page<LotListResponse> lots = lotService.getAllLots(request);
         return ResponseEntity.ok(lots);
     }
 
     // Получить лот по ID
     @GetMapping("/{id}")
-    public ResponseEntity<Lot> getLotById(@PathVariable long id) {
+    public ResponseEntity<LotListResponse> getLotById(@PathVariable long id) {
         return lotService.getLotById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
