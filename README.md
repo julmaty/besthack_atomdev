@@ -1,6 +1,6 @@
 # Система для онлайн-продаж лотов топлива
 
-Ссылка на презентацию: https://docs.google.com/presentation/d/1GnA2e5HWBv6K_yVPF1bXXdY26Hs-RBxCnLLRg7sRofQ/edit
+Ссылка на презентацию: [https://docs.google.com/presentation/d/1GnA2e5HWBv6K_yVPF1bXXdY26Hs-RBxCnLLRg7sRofQ/edit](https://docs.google.com/presentation/d/1y0nCuOZSu76ptC7B3lfnaMzlNN-Q3lCP/edit#slide=id.p1)
 
 Макет figma: https://www.figma.com/design/3KNlXaHJXAH6eUyQOBtaWT/%D0%90%D1%82%D0%BE%D0%BCDev%23?node-id=0-1&p=f&t=LDu25NL6LnNLD4XA-0
 
